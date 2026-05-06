@@ -5,7 +5,7 @@ zipInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
 async function handleFile(file) {
     if (!file || !file.name.endsWith('.zip')) return alert("Please upload a .zip file!");
-    statusMsg.textContent = "Filtering ghosts... 👻";
+    statusMsg.textContent = "Applying Vanessa Standard Filter... 🛡️";
     
     try {
         const zip = await JSZip.loadAsync(file);
@@ -19,58 +19,74 @@ async function handleFile(file) {
         const followers = await getJson("followers_1.json");
         const pending = await getJson("pending_follow_requests.json");
         const blocked = await getJson("blocked_profiles.json");
-        const restricted = await getJson("restricted_profiles.json");
         const storyHide = await getJson("hide_story_from.json");
-        const closeFriends = await getJson("close_friends.json");
 
-        // Helper to check if an account is deleted/deactivated
-        const isGhost = (name) => !name || name.startsWith('__deleted__') || name.includes('deleted_user');
+        // Helper: The "Vanessa Standard" Check
+        // 1. Must not start with __deleted__
+        // 2. If 'Name' data exists, it must not be empty
+        const validateAccount = (item) => {
+            const username = item.title || item.string_list_data?.[0]?.value || item.label_values?.find(l => l.label === "Username")?.value;
+            const nameField = item.label_values?.find(l => l.label === "Name")?.value;
 
-        // 1. Process Following (Separate Active vs Ghost)
-        const rawFollowing = following?.relationships_following?.map(i => i.title) || [];
-        const followList = rawFollowing.filter(name => !isGhost(name));
-        const ghostFollowing = rawFollowing.filter(name => isGhost(name));
+            if (!username || username.startsWith('__deleted__')) return { valid: false, username };
+            
+            // If the file provides a 'Name' field (like Pending or Blocked files), it must not be empty
+            if (nameField !== undefined && nameField.trim() === "") return { valid: false, username };
 
-        // 2. Process Followers[cite: 1]
-        const followerList = followers?.map(i => i.string_list_data?.[0]?.value).filter(name => name && !isGhost(name)) || [];
-
-        // 3. Logic for Non-Followers (Excluding Ghosts)[cite: 1]
-        const nonFollowers = followList.filter(name => !followerList.includes(name));
-
-        // 4. Update Header Stats (Active Only)
-        document.getElementById('followingCount').textContent = followList.length;
-        document.getElementById('followerCount').textContent = followerList.length;
-        document.getElementById('nonFollowerCount').textContent = nonFollowers.length;
-
-        // 5. Fill Cards with labels[cite: 1]
-        const extractUsername = (data, path) => {
-            if (!data) return [];
-            // Handle both structure types (label_values or direct string_list_data)[cite: 1]
-            return data.map(i => {
-                const name = i.label_values?.find(l => l.label === "Username")?.value || i.string_list_data?.[0]?.value;
-                return isGhost(name) ? null : name;
-            }).filter(Boolean);
+            return { valid: true, username };
         };
 
+        // 1. Process Following (Standard vs Ghosts)
+        const rawFollowing = following?.relationships_following || [];
+        const activeFollowing = [];
+        const ghostAccounts = [];
+
+        rawFollowing.forEach(item => {
+            const result = validateAccount(item);
+            if (result.valid) activeFollowing.push(result.username);
+            else ghostAccounts.push(result.username);
+        });
+
+        // 2. Process Followers (Standard only)
+        const activeFollowers = (followers || []).map(item => {
+            const result = validateAccount(item);
+            return result.valid ? result.username : null;
+        }).filter(Boolean);
+
+        // 3. Process Pending Requests (Apply strict Name check)
+        const activePending = [];
+        (pending || []).forEach(item => {
+            const result = validateAccount(item);
+            if (result.valid) activePending.push(result.username);
+            else ghostAccounts.push(result.username); // Move empty-name requests to Ghost list
+        });
+
+        // 4. Non-Followers Logic
+        const nonFollowers = activeFollowing.filter(name => !activeFollowers.includes(name));
+
+        // 5. Update UI
+        document.getElementById('followingCount').textContent = activeFollowing.length;
+        document.getElementById('followerCount').textContent = activeFollowers.length;
+        document.getElementById('nonFollowerCount').textContent = nonFollowers.length;
+
         fillList('nonFollowersList', nonFollowers);
-        fillList('ghostList', ghostFollowing);
-        fillList('pendingList', extractUsername(pending));
-        fillList('blockedList', extractUsername(blocked));
-        fillList('restrictedList', extractUsername(restricted));
-        fillList('hiddenStoryList', extractUsername(storyHide));
-        fillList('closeFriendsList', extractUsername(closeFriends));
+        fillList('pendingList', activePending);
+        fillList('ghostList', ghostAccounts);
+        
+        fillList('blockedList', (blocked || []).map(i => validateAccount(i).username));
+        fillList('hiddenStoryList', (storyHide || []).map(i => validateAccount(i).username));
 
         document.getElementById('mainHeader').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('hidden');
 
     } catch (err) {
         console.error(err);
-        alert("Parsing failed. Ensure your JSON export is correct.");
+        alert("Parsing failed. Check your console.");
     }
 }
 
 function fillList(id, items) {
     const el = document.getElementById(id);
-    const valid = items?.filter(Boolean) || [];
+    const valid = [...new Set(items?.filter(Boolean))];
     el.innerHTML = valid.length ? valid.map(i => `<li>${i}</li>`).join('') : "<li>None found</li>";
 }
