@@ -97,3 +97,38 @@ li { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); transiti
 li:hover { background: rgba(255, 255, 255, 0.05); }
 
 .hidden { display: none; }
+
+.guide-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    margin-bottom: 30px;
+    text-align: left;
+    overflow: hidden;
+}
+
+.guide-header {
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.guide-header:hover { background: rgba(255, 255, 255, 0.08); }
+
+.guide-content {
+    padding: 20px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.guide-content ol { padding-left: 20px; margin: 0; }
+.guide-content li { margin-bottom: 10px; border: none; padding: 0; }
+.guide-content ul { margin-top: 5px; padding-left: 20px; }
+
+#guideArrow { transition: transform 0.3s ease; }
+.rotate { transform: rotate(180deg); }

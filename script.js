@@ -1,3 +1,16 @@
+function toggleGuide() {
+    const content = document.getElementById('guideContent');
+    const arrow = document.getElementById('guideArrow');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        arrow.classList.add('rotate');
+    } else {
+        content.classList.add('hidden');
+        arrow.classList.remove('rotate');
+    }
+}
+
 const zipInput = document.getElementById('zipInput');
 const statusMsg = document.getElementById('statusMsg');
 

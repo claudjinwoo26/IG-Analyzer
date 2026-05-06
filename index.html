@@ -11,6 +11,30 @@
     <div class="glass-container">
         <header id="mainHeader">
             <h1>InstaAudit <span>Pro</span></h1>
+
+            <div class="guide-card" id="guideCard">
+            <div class="guide-header" onclick="toggleGuide()">
+                <span>📖 How to get your Instagram Data?</span>
+                <span id="guideArrow">▼</span>
+            </div>
+            <div class="guide-content hidden" id="guideContent">
+                <ol>
+                    <li>Go to <b>Settings & Activity</b> on your Instagram App or Website.</li>
+                    <li>Select <b>Accounts Center</b> > <b>Your information and permissions</b>.</li>
+                    <li>Click <b>Download your information</b> > <b>Download or transfer information</b>.</li>
+                    <li>Choose <b>Some of your information</b> (to save time).</li>
+                    <li>Scroll down and check <b>Followers and following</b>. Click Next.</li>
+                    <li><b>CRITICAL SETTINGS:</b>
+                        <ul>
+                            <li>Change Format to: <b style="color: var(--secondary)">JSON</b></li>
+                            <li>Change Date Range to: <b>All Time</b></li>
+                        </ul>
+                    </li>
+                    <li>Click <b>Create Files</b>. Instagram will email you when the .zip is ready!</li>
+                </ol>
+            </div>
+        </div>
+        
             <div class="upload-zone" id="dropZone">
                 <input type="file" id="zipInput" hidden accept=".zip">
                 <div class="upload-icon">📁</div>
