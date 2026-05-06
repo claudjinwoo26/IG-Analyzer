@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaAudit Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="glass-container">
+        <header id="mainHeader">
+            <h1>InstaAudit <span>Pro</span></h1>
+            <div class="upload-zone" id="dropZone">
+                <input type="file" id="zipInput" hidden accept=".zip">
+                <div class="upload-icon">📁</div>
+                <label for="zipInput" class="btn-primary">Select Instagram Zip</label>
+                <p id="statusMsg">Drag & drop your export file here</p>
+            </div>
+        </header>
+
+        <main id="dashboard" class="hidden">
+            <div class="action-bar">
+                <button onclick="location.reload()" class="btn-secondary">↺ Upload Different File</button>
+            </div>
+            
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="followingCount">0</h3>
+                    <p>Following</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="followerCount">0</h3>
+                    <p>Followers</p>
+                </div>
+                <div class="stat-card danger">
+                    <h3 id="nonFollowerCount" style="color: #ff4d4d;">0</h3>
+                    <p>Non-Followers</p>
+                </div>
+            </section>
+
+            <div class="info-grid">
+                <div class="data-card"><h3>🚩 Non-Followers</h3><ul id="nonFollowersList"></ul></div>
+                <div class="data-card"><h3>⏳ Pending Requests</h3><ul id="pendingList"></ul></div>
+                <div class="data-card"><h3>🚫 Blocked</h3><ul id="blockedList"></ul></div>
+                <div class="data-card"><h3>🔒 Restricted</h3><ul id="restrictedList"></ul></div>
+                <div class="data-card"><h3>👻 Story Hidden</h3><ul id="hiddenStoryList"></ul></div>
+                <div class="data-card"><h3>⭐️ Close Friends</h3><ul id="closeFriendsList"></ul></div>
+                <div class="data-card ghost-card">
+                    <h3>👻 Deactivated/Deleted</h3>
+                    <ul id="ghostList"></ul>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
